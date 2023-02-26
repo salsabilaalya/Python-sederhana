@@ -1,0 +1,177 @@
+#FITUR UNTUK USER
+
+daftar_buku = ["Dilan 1990", "Ketika Cinta Bertasbih","Supernova", "Sejarah Nasional dan Dunia","Dinosaurus dan Binatang Purba","Reptilia", "Chairil Sebuah Biografi", "Mahatma Gandhi", "Tan Malaka", "X-men", "Detective Conan", "One Piece"]
+daftar_anggota = {}
+menu_login = {}
+daftar_peminjam = []
+database_peminjaman = []
+daftar_buku_dipinjam = []
+history_peminjam = []
+jumlah_denda = []
+jumlah_buku_tersedia = {}
+
+
+def sign_up():
+    print("=== SIGN UP ===")
+    nama = input("Nama Lengkap\t: ")
+    email = input("Alamat Email\t: ")
+    password = input("Password\t: ")
+    nomor_anggota = len(daftar_anggota) + 1000
+    nomor_anggota2 = str(nomor_anggota)
+    daftar_anggota[nomor_anggota] = nama, email, password
+    menu_login[nomor_anggota2] = password
+    print("Akun Berhasil Dibuat. \nNomor Anggota :", nomor_anggota, "\nSilahkan Login!")
+
+
+def sign_in():
+    print("=== SIGN IN ===")
+    nomor_anggota2 = input("Nomor Anggota\t: ")
+    password = input("Password\t: ")
+    if nomor_anggota2 in menu_login and password == menu_login[nomor_anggota2] :
+        print("Login berhasil!\n")
+        while True :
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            print("Hi ", nomor_anggota2 ,"\n")
+            print("Masukan Kode 1 untuk Melihat Daftar buku yang Tersedia")
+            print("Masukan Kode 2 untuk Meminjam Buku")
+            print("Masukan Kode 3 untuk Mengembalikan Buku")
+            print("Masukan Kode 4 untuk Donasi Buku")
+            print("Masukan Kode 5 untuk Berhenti")
+            x = str(input("Masukan kode\t\t: "))
+
+            #DAFTAR BUKU
+            #Menampilkan daftar buku yang tersedia di perpustakaan, termasuk judul dan ketersediaan
+            if x == "1":
+                jumlah_buku_tersedia = {}
+                for judul_buku in daftar_buku:
+                    if judul_buku in jumlah_buku_tersedia:
+                        jumlah_buku_tersedia[judul_buku] += 1
+                    else:
+                        jumlah_buku_tersedia[judul_buku] = 1
+
+                hitung_judul = [(i, judul_buku) for judul_buku, i in jumlah_buku_tersedia.items()]
+                print("====DAFTAR BUKU PERPUSTAKAAN QL====")
+                print("Jumlah buku saat ini adalah", len(daftar_buku), "buku. \nTerdiri dari :")
+                for i in hitung_judul :
+                    print(i)
+
+        #PEMINJAMAN BUKU
+        #Mencatat informasi peminjaman buku, termasuk nama anggota, judul buku, dan tanggal peminjaman
+            elif x == "2":
+                judul_buku = str(input("Apa judul buku yang akan anda pinjam?\t\t: "))
+                import datetime 
+                from datetime import timedelta
+                tanggal_pinjam = datetime.date.today()
+                tanggal_peminjaman = tanggal_pinjam.strftime("%d-%m-%d")
+                jatuh_tempo = tanggal_pinjam + timedelta(days=3)
+                tanggal_jatuh_tempo = jatuh_tempo.strftime("%d-%m-%d")
+                if judul_buku in daftar_buku :
+                    def peminjam (a,b,c) :
+                        peminjam = "Anggota  : " + a + ", meminjam buku : " + b + ", pada : " + c
+                        return peminjam
+                        peminjam(nomor_anggota2, judul_buku, tanggal_peminjaman)
+                    database_peminjaman.append(peminjam(nomor_anggota2, judul_buku, tanggal_peminjaman))
+                    daftar_peminjam.append(nomor_anggota2)
+                    print("Anda berhasil meminjam buku dengan judul\t:", judul_buku, "\nTanggal Peminjaman\t\t\t\t:", tanggal_peminjaman, "\nMohon kembalikan buku ini maksimal\t\t:", tanggal_jatuh_tempo)
+                    daftar_buku.remove(judul_buku)
+                    daftar_buku_dipinjam.append(judul_buku)
+                else :
+                    print("Buku tidak tersedia\n Masukan judul buku lain dengan penulisan yang sesuai")
+
+        #PENGEMBALIAN BUKU
+        #Mencatat informasi pengembalian buku, termasuk Nama anggota, judul buku, tanggal pengembalian, dan denda
+
+            elif x == "3":
+                buku_yang_dikembalikan = str(input("Judul_buku yang dikembalikan\t: "))
+                if buku_yang_dikembalikan in daftar_buku_dipinjam :
+                    import datetime
+                    tanggal_pengembalian = datetime.date.today()
+                    tanggal_pengembalian2 = tanggal_pengembalian.strftime("%d-%m-%d")
+                    hitung_hari_terlambat = tanggal_pengembalian.day - jatuh_tempo.day
+                    hari_terlambat = str(hitung_hari_terlambat)
+                    if hitung_hari_terlambat >= 1:
+                        denda = hitung_hari_terlambat * 500
+                        jumlah_denda.append(denda)
+                        print("Anda terlambat ", hari_terlambat, "hari.\n Anda harus membayar denda sebesar :", denda)
+                    else :
+                        print("Terima kasih telah mengembalikan buku tepat waktu.")
+                    
+                    def pengembali (d,e,f) :
+                        pengembali = "Anggota  : " + d + ", mengembalikan buku : " + e + ", pada : " + f
+                        return pengembali
+                        pengembali(nomor_anggota2, buku_yang_dikembalikan, tanggal_pengembalian2)
+                    daftar_buku.append(buku_yang_dikembalikan)
+                    daftar_buku_dipinjam.remove(buku_yang_dikembalikan)
+                    database_peminjaman.remove(peminjam(nomor_anggota2, judul_buku, tanggal_peminjaman))
+                    history_peminjam.append(pengembali(nomor_anggota2, buku_yang_dikembalikan, tanggal_pengembalian2))
+                    daftar_peminjam.remove(nomor_anggota2)
+                else :
+                    print("Masukan judul buku yang sesuai\n")
+
+        #DONASI BUKU
+            elif x == "4":
+                tambahan_buku = str(input("Masukan judul buku yang akan disumbangkan\t: "))
+                daftar_buku.append(tambahan_buku)
+                jumlah_buku_tersedia ={}
+                for tambahan_buku in daftar_buku:
+                  if tambahan_buku in jumlah_buku_tersedia:
+                    jumlah_buku_tersedia[tambahan_buku] += 1
+                  else:
+                    jumlah_buku_tersedia[tambahan_buku] = 1
+                print("Terima kasih Anda terlah bersedia menjadi donatur buku di perpustakaan QL\n")
+
+        #lainnya/berhenti
+            elif x == "5":
+                break
+            else : 
+                print("Kode Tidak valid")
+    else:
+        print("Login gagal. nomor anggota atau password salah.\n")
+
+while True:
+    print(f"{'SELAMAT DATANG': ^40}")
+    print(f"{'Di Mini Library Bookstalkers Community': ^40}")
+    print("-"*100)
+    print("1. Sign up")
+    print("2. Sign in")
+    print("3. Keluar")
+    choice = input("Pilih menu\t: ")
+    
+    if choice == "1":
+        sign_up()
+    elif choice == "2":
+        sign_in()
+    elif choice == "3":
+        break
+    else:
+        print("Menu tidak valid.\n")
+
+
+
+#FItur Untuk Admin
+## Cek jumlah buku tersedia
+jumlah_buku_tersedia = {}
+for judul_buku in daftar_buku:
+  if judul_buku in jumlah_buku_tersedia:
+    jumlah_buku_tersedia[judul_buku] += 1
+  else:
+    jumlah_buku_tersedia[judul_buku] = 1
+hitung_judul = [(i, judul_buku) for judul_buku, i in jumlah_buku_tersedia.items()]
+print("====DAFTAR BUKU PERPUSTAKAAN QL====")
+print("Jumlah buku saat ini adalah", len(daftar_buku), "buku. \nTerdiri dari :")
+for i in hitung_judul :
+  print(i)
+  
+##Cek Daftar Anggota Aktif 
+print("Daftar Anggota Perpustakaan QL saat ini adalah ", len(daftar_anggota), "\n Terdiri dari : ", daftar_anggota)
+
+## Cek Daftar Peminjam
+print("Daftar Peminjam Perpustakaan QL saat ini adalah ", len(daftar_peminjam), "\nTerdiri dari : ", daftar_peminjam, "\nJudul Buku Dipinjam : ",daftar_buku_dipinjam)
+for i in database_peminjaman :
+  print (i)
+  
+##Cek History Peminjaman
+print("Daftar Buku yang Selesai Dipinjam \nTerdiri dari\t: ", len(history_peminjam))
+for i in history_peminjam :
+  print (i)
+print("Total denda yang telah dibayarkan anggota : ",jumlah_denda)
